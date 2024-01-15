@@ -1,0 +1,60 @@
+services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    container_name: portainer-nginx-proxy
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - nginx_certs:/etc/nginx/certs
+      - nginx_vhost:/etc/nginx/vhost.d
+      - nginx_html:/usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    network_mode: bridge
+
+  acme-companion:
+    image: nginxproxy/acme-companion
+    container_name: portainer-acme-companion
+    restart: always
+    env_file: portainer.env
+    environment:
+      - DEFAULT_EMAIL=${PORTAINER_DOMAIN_EMAIL}
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - acme:/etc/acme.sh
+    network_mode: bridge
+    depends_on:
+      - nginx-proxy
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    env_file: portainer.env
+    environment:
+      - VIRTUAL_HOST=${PORTAINER_DOMAIN}
+      - VIRTUAL_PORT=9000
+      - LETSENCRYPT_HOST=${PORTAINER_DOMAIN}
+      - LETSENCRYPT_EMAIL=${PORTAINER_DOMAIN_EMAIL}
+    ports:
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - data:/data
+    network_mode: bridge
+    depends_on:
+      - nginx-proxy
+      - acme-companion
+
+volumes:
+  data:
+  nginx_certs:
+  nginx_vhost:
+  nginx_html:
+  acme:
+
+# docker compose up --force-recreate --detach
+# docker compose down
