@@ -17,9 +17,9 @@ services:
     image: nginxproxy/acme-companion
     container_name: portainer-acme-companion
     restart: always
-    env_file: portainer.env
+    env_file: ./portainer.env
     environment:
-      - DEFAULT_EMAIL=${PORTAINER_DOMAIN_EMAIL}
+      - DEFAULT_EMAIL=${DEFAULT_EMAIL}
     volumes_from:
       - nginx-proxy
     volumes:
@@ -33,12 +33,12 @@ services:
     image: portainer/portainer-ce:latest
     container_name: portainer
     restart: always
-    env_file: portainer.env
+    env_file: ./portainer.env
     environment:
-      - VIRTUAL_HOST=${PORTAINER_DOMAIN}
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
       - VIRTUAL_PORT=9000
-      - LETSENCRYPT_HOST=${PORTAINER_DOMAIN}
-      - LETSENCRYPT_EMAIL=${PORTAINER_DOMAIN_EMAIL}
+      - LETSENCRYPT_HOST=${VIRTUAL_HOST}
+      - LETSENCRYPT_EMAIL=${DEFAULT_EMAIL}
     ports:
       - 9000:9000
     volumes:
