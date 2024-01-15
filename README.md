@@ -16,7 +16,7 @@ A template for rapid deployment of Portainer on shared hosting. It uses:
 3. Put your values for `PORTAINER_DOMAIN` and `PORTAINER_DOMAIN_EMAIL`. `PORTAINER_DOMAIN` **without** specifying the `http/https` protocol and **without** a `/` at the end. 
 4. Start you container
     ```bash
-    docker compose up --force-recreate --detach
+    docker compose up --detach
     ```
 5. Open the `PORTAINER_DOMAIN` address in your favorite browser. 
 6. To stop
